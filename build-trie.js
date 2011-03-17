@@ -1,5 +1,5 @@
-var txt = require("fs").readFileSync("dict/ospd4.txt", "utf8"),
-	words = txt.split("\n"),
+var txt = require("fs").readFileSync("dict/string.txt", "utf8"),
+	words = txt.split(" "),
 	trie = {},
 	end = {},
 	keepEnd = {},
@@ -24,6 +24,7 @@ for ( var i = 0, l = words.length; i < l; i++ ) {
 	}
 }
 
+/*
 // Optimize the structure
 optimize( trie );
 
@@ -41,8 +42,17 @@ for ( var key in end ) {
 finishSuffixes( trie, keepEnd, end );
 
 trie.$ = endings;
+*/
 
-console.log( JSON.stringify( trie ).replace(/"/g, "") );
+var ret = JSON.stringify( trie ).replace(/"/g, "");
+
+var reserved = [ "abstract", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "debugger", "default", "delete", "do", "double", "else", "enum", "export", "extends", "false", "final", "finally", "float", "for", "function", "goto", "if", "implements", "import", "in", "instanceof", "int", "interface", "long", "native", "new", "null", "package", "private", "protected", "public", "return", "short", "static", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "true", "try", "typeof", "var", "void", "volatile", "while", "with" ];
+
+for ( var i = 0; i < reserved.length; i++ ) {
+	ret = ret.replace( new RegExp("([{,])(" + reserved[i] + "):", "g"), "$1'$2':" );
+}
+
+console.log( ret );
 
 function optimize( cur ) {
 	var num = 0, last;

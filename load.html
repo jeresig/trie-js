@@ -1,0 +1,13 @@
+<script>
+window.onload = function() {
+	var xhr = new XMLHttpRequest();
+	xhr.open( "GET", "dict/suffix.js", false );
+	xhr.send( null );
+	
+	alert( xhr.responseText.length );
+
+	var start = (new Date).getTime();
+	eval( "(" + xhr.responseText + ")" );
+	alert( (new Date).getTime() - start );
+};
+</script>
