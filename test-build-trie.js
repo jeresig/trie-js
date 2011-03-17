@@ -1,16 +1,18 @@
 var fs = require("fs"),
-	util = require("./util.js");
+	util = require("./util.js"),
+	Benchmark = require("benchmark"),
+	suite = new Benchmark.Suite;
 
 fs.readFile( "dict/suffix.js", "utf8", function( err, data ) {
+
 	var all = [];
-	
-	var start = (new Date).getTime();
-	
-	for ( var i = 0; i < 100; i++ ) {
+
+	suite.add('Build trie', function() {
 		all.push( util.buildTrie( data ) );
-	}
-	
-	console.log( (new Date).getTime() - start );
-	
-	while(true){}
+	})
+	.on('cycle', function(bench) {
+		console.log(String(bench));
+	})
+	.run(true);
+
 });

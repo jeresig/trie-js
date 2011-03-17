@@ -1,0 +1,6 @@
+[submodule "Benchmark.js"]
+	path = Benchmark.js
+	url = git@github.com:mathiasbynens/Benchmark.js.git
+[submodule "vendor/Benchmark.js"]
+	path = vendor/Benchmark.js
+	url = git@github.com:mathiasbynens/Benchmark.js.git

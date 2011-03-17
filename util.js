@@ -7,7 +7,7 @@ exports.buildTrie = function( txt ) {
 exports.buildStringDict = function( txt ) {
 	return (dict = " " + txt + " ");
 };
-	
+
 exports.buildHashDict = function( txt ) {
 	var words = txt.split(" "),
 		tmp = {};
@@ -15,13 +15,13 @@ exports.buildHashDict = function( txt ) {
 	for ( var i = 0, l = words.length; i < l; i++ ) {
 		tmp[ words[i] ] = true;
 	}
-	
+
 	return (dict = tmp);
 };
 
 exports.findTrieWord = function findTrieWord( word, cur ) {
 	cur = cur || dict;
-	
+
 	for ( var node in cur ) {
 		if ( word.indexOf( node ) === 0 ) {
 			var val = typeof cur[ node ] === "number" && cur[ node ] ?
@@ -36,7 +36,7 @@ exports.findTrieWord = function findTrieWord( word, cur ) {
 			}
 		}
 	}
-	
+
 	return false;
 };
 
