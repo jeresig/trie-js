@@ -1,5 +1,5 @@
 var txt = require("fs").readFileSync("dict/string.txt", "utf8"),
-	words = txt.split(" "),
+	words = txt.replace(/\n/g, "").split(" "),
 	trie = {},
 	end = {},
 	keepEnd = {},
