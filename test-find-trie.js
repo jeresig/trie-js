@@ -1,6 +1,6 @@
 var fs = require("fs"),
 	util = require("./util.js"),
-	Benchmark = require("benchmark"),
+	Benchmark = require("./vendor/Benchmark.js/benchmark.js"),
 	suite = new Benchmark.Suite;
 
 fs.readFile( "dict/string.txt", "utf8", function( err, data ) {
@@ -8,8 +8,9 @@ fs.readFile( "dict/string.txt", "utf8", function( err, data ) {
 	var words = data.split(" ");
 
 	fs.readFile( "dict/suffix.js", "utf8", function( err, data ) {
+
 		util.buildTrie( data );
-	
+
 		suite.add(function() {
 			for ( var i = 0, l = words.length; i < l; i++ ) {
 				util.findTrieWord( words[i] );
@@ -26,4 +27,5 @@ fs.readFile( "dict/string.txt", "utf8", function( err, data ) {
 		.run(true);
 
 	});
+
 });

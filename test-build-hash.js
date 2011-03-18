@@ -1,6 +1,6 @@
 var fs = require("fs"),
 	util = require("./util.js"),
-	Benchmark = require("benchmark"),
+	Benchmark = require("./vendor/Benchmark.js/benchmark.js"),
 	suite = new Benchmark.Suite;
 
 fs.readFile( "dict/string.txt", "utf8", function( err, data ) {
@@ -12,6 +12,9 @@ fs.readFile( "dict/string.txt", "utf8", function( err, data ) {
 	})
 	.on('cycle', function(bench) {
 		console.log(String(bench));
+	})
+	.on('complete', function() {
+		while(true){}
 	})
 	.run(true);
 
