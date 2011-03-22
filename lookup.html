@@ -1,0 +1,17 @@
+<script src="Bits.js"></script>
+<script>
+window.onload = function() {
+	var xhr = new XMLHttpRequest();
+	xhr.open( "GET", "dict/succinct.txt", false );
+	xhr.send( null );
+	
+	var parts = xhr.responseText.split(",");
+	var dict = new FrozenTrie( parts[2], parts[1], parts[0] );
+	
+	var start = (new Date).getTime();
+	for ( var i = 0, l = 100; i < l; i++ ) {
+		dict.lookup( "test" );
+	}
+	alert( (new Date).getTime() - start );
+};
+</script>
