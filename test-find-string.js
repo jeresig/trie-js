@@ -1,31 +1,26 @@
 var fs = require("fs"),
-	util = require("./util.js"),
-	Benchmark = require("./vendor/Benchmark.js/benchmark.js"),
-	suite = new Benchmark.Suite;
+	util = require("./util.js");
 
 fs.readFile( "dict/string.txt", "utf8", function( err, data ) {
-
 	var words = data.split(" ");
 
-	fs.readFile( "dict/simple.js", "utf8", function( err, data ) {
-
+	fs.readFile( "dict/string.txt", "utf8", function( err, data ) {
 		util.buildStringDict( data );
+	
+		var start = (new Date).getTime();
 
-		suite.add(function() {
-			for ( var i = 0, l = words.length; i < l; i++ ) {
-				util.findStringWord( words[i] );
-			}
-		})
-		.add(function() {
-			for ( var i = 0, l = words.length; i < l; i++ ) {
-				util.findStringWord( words[i] + "z" );
-			}
-		})
-		.on('cycle', function(bench) {
-			console.log(String(bench));
-		})
-		.run(true);
+		for ( var i = 0, l = words.length; i < l; i++ ) {
+			util.findStringWord( words[i] );
+		}
 
+		console.log( (new Date).getTime() - start );
+
+		start = (new Date).getTime();
+
+		for ( var i = 0, l = words.length; i < l; i++ ) {
+			util.findStringWord( words[i] + "z" );
+		}
+
+		console.log( (new Date).getTime() - start );
 	});
-
 });

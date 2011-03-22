@@ -1,7 +1,18 @@
-var dict;
+var dict,
+	FrozenTrie = require("./Bits.js").FrozenTrie;
 
 exports.buildTrie = function( txt ) {
 	return (dict = eval( "(" + txt + ")" ));
+};
+
+exports.buildBinaryDict = function( txt ) {
+	return (dict = txt.split(","));
+};
+
+exports.buildSuccinctDict = function( txt ) {
+	var parts = txt.split(",");
+	
+	return (dict = new FrozenTrie( parts[2], parts[1], parts[0] ));
 };
 
 exports.buildStringDict = function( txt ) {
@@ -38,6 +49,40 @@ exports.findTrieWord = function findTrieWord( word, cur ) {
 	}
 
 	return false;
+};
+
+exports.findBinaryWord = function( word ) {
+	var l = word.length;
+	
+	if ( !dict[l] ) {
+		return false;
+	}
+	
+	var words = dict[l].length / l,
+		low = 0, high = words - 1, mid = Math.floor( words / 2 );
+		
+	while ( high >= low ) {
+		var found = dict[l].substr( l * mid, l );
+		
+		if ( word === found ) {
+			return true;
+		}
+		
+		if ( word < found ) {
+			high = mid - 1;
+		
+		} else {
+			low = mid + 1;
+		}
+		
+		mid = Math.floor( (low + high) / 2 );
+	}
+	
+	return false;
+};
+
+exports.findSuccinctWord = function( word ) {
+	return dict.lookup( word );
 };
 
 exports.findStringWord = function( word ) {

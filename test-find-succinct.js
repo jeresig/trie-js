@@ -4,13 +4,13 @@ var fs = require("fs"),
 fs.readFile( "dict/string.txt", "utf8", function( err, data ) {
 	var words = data.split(" ");
 
-	fs.readFile( "dict/suffix.js", "utf8", function( err, data ) {
-		util.buildTrie( data );
+	fs.readFile( "dict/succinct.txt", "utf8", function( err, data ) {
+		util.buildSuccinctDict( data );
 	
 		var start = (new Date).getTime();
 
 		for ( var i = 0, l = words.length; i < l; i++ ) {
-			util.findTrieWord( words[i] );
+			util.findSuccinctWord( words[i] );
 		}
 
 		console.log( (new Date).getTime() - start );
@@ -18,7 +18,7 @@ fs.readFile( "dict/string.txt", "utf8", function( err, data ) {
 		start = (new Date).getTime();
 
 		for ( var i = 0, l = words.length; i < l; i++ ) {
-			util.findTrieWord( words[i] + "z" );
+			util.findSuccinctWord( words[i] + "z" );
 		}
 
 		console.log( (new Date).getTime() - start );
