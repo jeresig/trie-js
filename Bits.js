@@ -55,6 +55,17 @@ var W = 6;
 var L1 = 32*32;
 var L2 = 32;
 
+var BitsInByte = [ 
+		0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5
+	, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6
+	, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6
+	, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7
+	, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6
+	, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7
+	, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7
+	, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8 ]
+var MaskTop= [ 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01, 0x00 ]
+
 var arr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".split("")
   , map = {}
 
@@ -137,19 +148,7 @@ function BitString( str ) {
 	this.length = str.length * W;
 }
 
-var BitsInByte = [ 
-		0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5
-	, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6
-	, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6
-	, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7
-	, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6
-	, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7
-	, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7
-	, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8 ]
-var MaskTop= [ 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01, 0x00 ]
-
 BitString.prototype = {
-
 	/**
 			Returns a decimal number, consisting of a certain number, n, of bits
     	starting at a certain position, p.
@@ -214,16 +213,78 @@ BitString.prototype = {
     string.
  */
 function RankDirectory( directoryData, bitData, numBits, l1Size, l2Size ) {
-        this.directory = new BitString( directoryData );
-        this.data = new BitString( bitData );
-        this.l1Size = l1Size;
-        this.l2Size = l2Size;
-        this.l1Bits = Math.ceil( Math.log( numBits ) / Math.log( 2 ) );
-        this.l2Bits = Math.ceil( Math.log( l1Size ) / Math.log( 2 ) );
-        this.sectionBits = (l1Size / l2Size - 1) * this.l2Bits + this.l1Bits;
-        this.numBits = numBits;
+  this.directory = new BitString( directoryData );
+  this.data = new BitString( bitData );
+  this.l1Size = l1Size;
+  this.l2Size = l2Size;
+  this.l1Bits = (( Math.log( numBits ) / Math.LN2 )+.5)>>>0;
+  this.l2Bits = (( Math.log( l1Size ) / Math.LN2 )+.5)>>>0;
+  this.sectionBits = (l1Size / l2Size - 1) * this.l2Bits + this.l1Bits;
+  this.numBits = numBits;
+  this.rankCache = {0:{},1:{}}
 }
 
+
+
+RankDirectory.prototype = {
+  /**
+  		Returns the string representation of the directory.
+  */
+  getData: function() {
+  	return this.directory.bytes.join("");
+  }
+
+  /**
+  		Returns the number of 1 or 0 bits (depending on the "which" parameter) to
+  		to and including position x.
+  */
+, rank: function( which, x ) {
+		if ( which === 0 ) return x - this.rank( 1, x ) + 1;
+
+		var rank = 0;
+		var o = x;
+		var sectionPos = 0;
+
+		if ( o >= this.l1Size ) {
+			sectionPos = ( o / this.l1Size | 0 ) * this.sectionBits;
+			rank = this.directory.get( sectionPos - this.l1Bits, this.l1Bits );
+			o = o % this.l1Size;
+		}
+
+		if ( o >= this.l2Size ) {
+			sectionPos += ( o / this.l2Size | 0 ) * this.l2Bits;
+			rank += this.directory.get( sectionPos - this.l2Bits, this.l2Bits );
+		}
+		var mod = x % this.l2Size
+
+		rank += this.data.count( x - mod, mod + 1 );
+
+		return rank;
+	}
+
+	/**
+			Returns the position of the y'th 0 or 1 bit, depending on the "which"
+			parameter.
+	*/
+, select: function( which, find ) {
+  	var lo = 0, hi = this.numBits, mid, val = -1, found;
+
+  	while ( lo <= hi ) {
+  		mid = lo + ((hi - lo)>>>1);
+  		found = this.rankCache[which][mid] || (this.rankCache[which][mid] = this.rank( which, mid ));
+
+  		if ( found < find ) {
+  			lo = mid + 1;
+  		} else {
+  			// We have to continue searching after we have found it,
+  			// because we want the _first_ occurrence.
+  			if ( found === find )  val = mid;
+  			hi = mid - 1;
+  		}
+  	}
+  	return val;
+  }
+};
 /**
     Used to build a rank directory from the given input string.
 
@@ -263,75 +324,6 @@ RankDirectory.Create = function( data, numBits, l1Size, l2Size ) {
     }
 
     return new RankDirectory( directory.getData(), data, numBits, l1Size, l2Size );
-};
-
-
-RankDirectory.prototype = {
-
-
-    /**
-        Returns the string representation of the directory.
-     */
-    getData: function() {
-        return this.directory.bytes;
-    },
-
-    /**
-      Returns the number of 1 or 0 bits (depending on the "which" parameter) to
-      to and including position x.
-      */
-    rank: function( which, x ) {
-
-        if ( which === 0 ) return x - this.rank( 1, x ) + 1;
-
-        var rank = 0;              
-        var o = x;
-        var sectionPos = 0;
-
-        if ( o >= this.l1Size ) {
-            sectionPos = ( o / this.l1Size | 0 ) * this.sectionBits;
-            rank = this.directory.get( sectionPos - this.l1Bits, this.l1Bits );
-            o = o % this.l1Size;
-        }
-
-        if ( o >= this.l2Size ) {
-            sectionPos += ( o / this.l2Size | 0 ) * this.l2Bits;
-            rank += this.directory.get( sectionPos - this.l2Bits, this.l2Bits );
-        }
-
-        rank += this.data.count( x - x % this.l2Size, x % this.l2Size + 1 );
-
-        return rank;
-    },
-
-    /**
-      Returns the position of the y'th 0 or 1 bit, depending on the "which"
-      parameter.
-      */
-    select: function( which, y ) {
-        var high = this.numBits;
-        var low = -1;
-        var val = -1;
-
-        while ( high - low > 1 ) {
-            var probe = ((high + low) / 2) | 0;
-            var r = this.rank( which, probe );
-
-            if ( r === y ) {
-                // We have to continue searching after we have found it,
-                // because we want the _first_ occurrence.
-                val = probe;
-                high = probe;
-            } else if ( r < y ) {
-                low = probe;
-            } else {
-                high = probe;
-            }
-        }
-        //alert(val)
-
-        return val;
-    }
 };
 
 /**
@@ -463,13 +455,13 @@ FrozenTrie.prototype = {
 		var t = this, mid = 0, i = 0, len = word.length, a = "a".charCodeAt(0)
 
 		for (;i < len; i++ ) {
-			var find = word.charAt(i)
+			var find = word.charCodeAt(i) - a
 			  , lo = t.directory.select( 0, mid+1 ) - mid
 			  , hi = t.directory.select( 0, mid+2 ) - mid - 2;
 
 			while ( lo <= hi ) {
-				mid = ((hi + lo)/2)>>>0
-				var found = String.fromCharCode( t.data.get( t.letterStart + mid * 6 + 1, 5 ) + a );
+				mid = lo + ((hi-lo)>>>1)
+				var found = t.data.get( t.letterStart + mid * 6 + 1, 5 );
 				if ( found === find ) break
 				if ( found > find ) hi = mid - 1
 				else lo = mid + 1
