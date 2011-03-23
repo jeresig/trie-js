@@ -66,9 +66,10 @@ function CHR(id)
 /** 
     Returns the decimal value of the given character unit.
  */
-function ORD(ch) 
-{
-    return BASE64.indexOf(ch);
+var ORD = {};
+
+for ( var i = 0; i < BASE64.length; i++ ) {
+	ORD[ BASE64[i] ] = i;
 }
 
 /**
@@ -201,12 +202,12 @@ BitString.prototype = {
 
         // case 1: bits lie within the given byte
         if ( ( p % W ) + n <= W ) {
-            return ( ORD( this.bytes[ p / W | 0 ] ) & BitString.MaskTop[ p % W ] ) >> 
+            return ( ORD[ this.bytes[ p / W | 0 ] ] & BitString.MaskTop[ p % W ] ) >> 
                 ( W - p % W - n );
 
         // case 2: bits lie incompletely in the given byte
         } else {
-            var result = ( ORD( this.bytes[ p / W | 0 ] ) & 
+            var result = ( ORD[ this.bytes[ p / W | 0 ] ] & 
                 BitString.MaskTop[ p % W ] );
 
             var l = W - p % W;
@@ -214,13 +215,13 @@ BitString.prototype = {
             n -= l;
 
             while ( n >= W ) {
-                result = (result << W) | ORD( this.bytes[ p / W | 0 ] );
+                result = (result << W) | ORD[ this.bytes[ p / W | 0 ] ];
                 p += W;
                 n -= W;
             }
 
             if ( n > 0 ) {
-                result = (result << n) | ( ORD( this.bytes[ p / W | 0 ] ) >> 
+                result = (result << n) | ( ORD[ this.bytes[ p / W | 0 ] ] >> 
                     ( W - n ) );
             }
 
