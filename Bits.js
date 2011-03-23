@@ -453,41 +453,30 @@ function FrozenTrie( data, directoryData, nodeCount ) {
 }
 
 FrozenTrie.prototype = {
-  /**
-  		Retrieve the trie of the trie, given its index in level-order.
-  		This is a private function that you don't have to use.
-  */
-  getNodeByIndex: function( index ) {
-  	// retrieve the 6-bit letter.
-  	var letter = String.fromCharCode( this.data.get( this.letterStart + index * 6 + 1, 5 ) + 'a'.charCodeAt(0));
-  	
-  	return [ this, letter ];
-  }
 
   /**
   		Look-up a word in the trie. Returns true if and only if the word exists
   		in the trie.
   */
 
-, lookup: function( word ) {
-		var node = this.getNodeByIndex(0), i = 0, len = word.length, mid = 0;
-		for ( ;i < len; i++ ) {
-			var child, trie = node[0], find = word.charAt(i)
-			  , lo = trie.directory.select( 0, mid+1 ) - mid
-			  , hi = trie.directory.select( 0, mid+2 ) - mid - 2;
+  lookup: function( word ) {
+		var t = this, mid = 0, i = 0, len = word.length, a = "a".charCodeAt(0)
+
+		for (;i < len; i++ ) {
+			var find = word.charAt(i)
+			  , lo = t.directory.select( 0, mid+1 ) - mid
+			  , hi = t.directory.select( 0, mid+2 ) - mid - 2;
 
 			while ( lo <= hi ) {
 				mid = ((hi + lo)/2)>>>0
-				child = trie.getNodeByIndex( mid )
-				if ( child[1] === find ) break
-				if ( child[1] > find ) hi = mid - 1
+				var found = String.fromCharCode( t.data.get( t.letterStart + mid * 6 + 1, 5 ) + a );
+				if ( found === find ) break
+				if ( found > find ) hi = mid - 1
 				else lo = mid + 1
 			}
 			if (lo>hi) return false
-
-			node = child;
 		}
-  	return trie.data.get( trie.letterStart + mid * 6, 1 ) === 1;
+  	return t.data.get( t.letterStart + mid * 6, 1 ) === 1;
 	}
 };
 
