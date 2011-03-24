@@ -145,7 +145,7 @@ BitWriter.prototype = {
 */
 function BitString( str ) {
 	this.bytes = str.split("");
-	this.length = str.length * W;
+	//this.length = str.length * W;
 }
 
 BitString.prototype = {
@@ -271,7 +271,11 @@ RankDirectory.prototype = {
 
   	while ( lo <= hi ) {
   		mid = lo + ((hi - lo)>>>1);
+  		//*
   		found = this.rankCache[which][mid] || (this.rankCache[which][mid] = this.rank( which, mid ));
+  		/*/
+  		found = this.rank( which, mid );
+  		//*/
 
   		if ( found < find ) {
   			lo = mid + 1;
@@ -284,46 +288,6 @@ RankDirectory.prototype = {
   	}
   	return val;
   }
-};
-/**
-    Used to build a rank directory from the given input string.
-
-    @param data A javascript string containing the data, as readable using the
-    BitString object.
-
-    @param numBits The number of bits to index.
-    
-    @param l1Size The number of bits that each entry in the Level 1 table
-    summarizes. This should be a multiple of l2Size.
-
-    @param l2Size The number of bits that each entry in the Level 2 table
-    summarizes.
- */
-RankDirectory.Create = function( data, numBits, l1Size, l2Size ) {
-    var bits = new BitString( data );
-    var p = 0;
-    var i = 0;
-    var count1 = 0, count2 = 0;
-    var l1bits = Math.ceil( Math.log( numBits ) / Math.log(2) );
-    var l2bits = Math.ceil( Math.log( l1Size ) / Math.log(2) );
-
-    var directory = new BitWriter();
-
-    while( p + l2Size <= numBits ) {
-        count2 += bits.count( p, l2Size );
-        i += l2Size;
-        p += l2Size;
-        if ( i === l1Size ) {
-            count1 += count2;
-            directory.write( count1, l1bits );
-            count2 = 0;
-            i = 0;
-        } else {
-            directory.write( count2, l2bits );
-        }
-    }
-
-    return new RankDirectory( directory.getData(), data, numBits, l1Size, l2Size );
 };
 
 /**
@@ -344,17 +308,14 @@ function Trie() {
 }
 
 Trie.prototype = {
-
-
     /**
       Inserts a word into the trie. This function is fastest if the words are
       inserted in alphabetical order.
      */
-    insert: function( word ) {      
+     insert: function( word ) {      
 
         var commonPrefix = 0;
-        for( var i = 0; i < Math.min( word.length, this.previousWord.length );
-                i++ )
+        for( var i = 0; i < Math.min( word.length, this.previousWord.length ); i++ )
         {
             if ( word[i] !== this.previousWord[i] ) { break; }
             commonPrefix += 1;
@@ -435,13 +396,14 @@ Trie.prototype = {
     @param nodeCount The number of nodes in the trie.
   */
 
-function FrozenTrie( data, directoryData, nodeCount ) {
+function FrozenTrie( nodeCount, data ) {
 	this.data = new BitString( data );
-	this.directory = new RankDirectory( directoryData, data, nodeCount * 2 + 1, L1, L2 );
-
+	
 	// The position of the first bit of the data in 0th node. In non-root
 	// nodes, this would contain 6-bit letters.
 	this.letterStart = nodeCount * 2 + 1;
+
+	this.directory = this.getRankDirectory()
 }
 
 FrozenTrie.prototype = {
@@ -455,13 +417,13 @@ FrozenTrie.prototype = {
 		var t = this, mid = 0, i = 0, len = word.length, a = "a".charCodeAt(0)
 
 		for (;i < len; i++ ) {
-			var find = word.charCodeAt(i) - a
+			var find = word.charCodeAt(i) - a, found
 			  , lo = t.directory.select( 0, mid+1 ) - mid
 			  , hi = t.directory.select( 0, mid+2 ) - mid - 2;
 
 			while ( lo <= hi ) {
 				mid = lo + ((hi-lo)>>>1)
-				var found = t.data.get( t.letterStart + mid * 6 + 1, 5 );
+				found = t.data.get( t.letterStart + mid * 6 + 1, 5 );
 				if ( found === find ) break
 				if ( found > find ) hi = mid - 1
 				else lo = mid + 1
@@ -470,6 +432,40 @@ FrozenTrie.prototype = {
 		}
   	return t.data.get( t.letterStart + mid * 6, 1 ) === 1;
 	}
+, insert: function( word ) {
+		// TODO direct insertion
+  
+  }
+, getRankDirectory: function(){
+  	var numBits = this.letterStart
+  	var l1Size = L1
+  	var l2Size = L2
+  	
+    var bits = this.data
+    var p = 0;
+    var i = 0;
+    var count1 = 0, count2 = 0;
+    var l1bits = Math.ceil( Math.log( numBits ) / Math.log(2) );
+    var l2bits = Math.ceil( Math.log( l1Size ) / Math.log(2) );
+
+    var directory = new BitWriter();
+
+    while( p + l2Size <= numBits ) {
+        count2 += bits.count( p, l2Size );
+        i += l2Size;
+        p += l2Size;
+        if ( i === l1Size ) {
+            count1 += count2;
+            directory.write( count1, l1bits );
+            count2 = 0;
+            i = 0;
+        } else {
+            directory.write( count2, l2bits );
+        }
+    }
+    return new RankDirectory( directory.getData(), bits.bytes.join(""), numBits, l1Size, l2Size );
+
+  }
 };
 
 /**************************************************************************************************
