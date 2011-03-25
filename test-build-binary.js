@@ -1,4 +1,5 @@
 var fs = require("fs"),
+	sys = require("sys"),
 	util = global.util = require("./util"),
 	data = global.data = fs.readFileSync( "dict/binary.txt", "utf8" ),
 	Benchmark = require("./vendor/Benchmark.js/benchmark");
@@ -12,9 +13,7 @@ var fs = require("fs"),
 		util.buildBinaryDict( data );
 	}
 })
-.on("cycle", function(bench) {
-	console.log(String(bench));
-})
+.on("cycle", sys.puts)
 .run();
 
 while (true) { }

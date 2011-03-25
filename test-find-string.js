@@ -1,4 +1,5 @@
 var fs = require("fs"),
+	sys = require("sys"),
 	util = global.util = require("./util"),
 	words = global.words = fs.readFileSync( "dict/string.txt", "utf8" ).split(" "),
 	Benchmark = require("./vendor/Benchmark.js/benchmark");
@@ -29,7 +30,5 @@ util.buildStringDict( fs.readFileSync( "dict/string.txt", "utf8" ) );
 			util.findStringWord( words[i] + "z" );
 		}
 	})
-	.on("cycle", function(bench) {
-		console.log(String(bench));
-	})
+	.on("cycle", sys.puts)
 	.run();

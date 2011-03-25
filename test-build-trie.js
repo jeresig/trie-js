@@ -1,4 +1,5 @@
 var fs = require("fs"),
+	sys = require("sys"),
 	util = global.util = require("./util"),
 	data = global.data = fs.readFileSync( "dict/suffix.js", "utf8" ),
 	Benchmark = require("./vendor/Benchmark.js/benchmark");
@@ -11,10 +12,8 @@ var fs = require("fs"),
 	fn: function() {
 		util.buildTrie( data );
 	}
-	})
-.on("cycle", function(bench) {
-	console.log(String(bench));
 })
+.on("cycle", sys.puts)
 .run();
 
 while (true) { }
