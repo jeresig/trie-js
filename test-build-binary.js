@@ -1,16 +1,20 @@
 var fs = require("fs"),
-	util = require("./util.js");
+	util = global.util = require("./util"),
+	data = global.data = fs.readFileSync( "dict/binary.txt", "utf8" ),
+	Benchmark = require("./vendor/Benchmark.js/benchmark");
 
-fs.readFile( "dict/binary.txt", "utf8", function( err, data ) {
-	var all = [];
-	
-	var start = (new Date).getTime();
-	
-	for ( var i = 0; i < 100; i++ ) {
-		all.push( util.buildBinaryDict( data ) );
+(new Benchmark.Suite).add("Build binary", {
+	setup: function() {
+		var data = global.data,
+			util = global.util;
+	},
+	fn: function() {
+		util.buildBinaryDict( data );
 	}
-	
-	console.log( (new Date).getTime() - start );
-	
-	while(true){}
-});
+})
+.on("cycle", function(bench) {
+	console.log(String(bench));
+})
+.run();
+
+while (true) { }

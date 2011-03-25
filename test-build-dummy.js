@@ -1,6 +1,5 @@
 var fs = require("fs"),
-	util = require("./util.js");
+	util = require("./util.js"),
+	data = fs.readFileSync( "dict/string.txt", "utf8");
 
-fs.readFile( "dict/string.txt", "utf8", function( err, data ) {
-	while(true){}
-});
+while (true) { }
