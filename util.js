@@ -31,6 +31,10 @@ exports.buildHashDict = function( txt ) {
 };
 
 exports.findTrieWord = function findTrieWord( word, cur ) {
+	if ( cur === 0 ) {
+		return false;
+	}
+
 	cur = cur || dict;
 
 	for ( var node in cur ) {
