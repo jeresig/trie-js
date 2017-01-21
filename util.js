@@ -12,7 +12,7 @@ exports.buildBinaryDict = function( txt ) {
 exports.buildSuccinctDict = function( txt ) {
 	var parts = txt.split(",");
 	
-	return (dict = new FrozenTrie( parts[2], parts[1], parts[0] ));
+	return (dict = new FrozenTrie( parts[0], parts[1] ));
 };
 
 exports.buildStringDict = function( txt ) {
